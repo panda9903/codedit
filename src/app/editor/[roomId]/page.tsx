@@ -1,17 +1,23 @@
 "use client";
 
-import React, { ReactElement, useEffect, useRef } from "react";
+import React, { ReactElement, useEffect, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { initSocket } from "../../socket";
 import { useParams } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
+interface User {
+  username: string;
+  socketId: string;
+}
+
 const CodeEditor = () => {
   const editorRef = useRef(null);
   const socketRef = useRef<any>(null);
   const roomIdRef = useRef<string[] | string | null>(null);
   const usernameRef = useRef<string | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -52,9 +58,45 @@ const CodeEditor = () => {
         roomId,
         username,
       });
+
+      socketRef.current.on(
+        "joined",
+        ({
+          clientsList,
+          username,
+          socketId,
+        }: {
+          clientsList: User[];
+          username: string;
+          socketId: string;
+        }) => {
+          console.log(username, usernameRef.current);
+          if (username !== usernameRef.current) {
+            // show toast - user joined
+            console.log("User joined", username);
+          }
+          setUsers(clientsList);
+        }
+      );
+
+      socketRef.current.on(
+        "disconnected",
+        ({ socketId, username }: { socketId: string; username: string }) => {
+          //show toast user left room
+          console.log("Disconnecting", username);
+          setUsers((prev) => prev.filter((user) => user.socketId !== socketId));
+          console.log("User left", username);
+        }
+      );
     };
 
     init();
+
+    return () => {
+      socketRef.current.off("disconnected");
+      socketRef.current.off("joined");
+      socketRef.current.disconnect();
+    };
   }, []);
 
   function handleEditorDidMount(editor: any, monaco: any) {}
