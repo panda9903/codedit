@@ -19,6 +19,8 @@ const CodeEditor = () => {
   const usernameRef = useRef<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [code, setCode] = useState<string>("");
+  const [timeOut, setTimeOut] = useState<any>(setTimeout(() => {}, 0));
+  const [cursor, setCursor] = useState<any>({ line: 0, column: 0 });
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -28,7 +30,7 @@ const CodeEditor = () => {
 
   roomIdRef.current = roomId;
   usernameRef.current = username;
-  console.log(roomId, username);
+  //console.log(roomId, username);
 
   const handleError = (err: any) => {
     console.error(err);
@@ -71,12 +73,17 @@ const CodeEditor = () => {
           username: string;
           socketId: string;
         }) => {
-          console.log(username, usernameRef.current);
+          //console.log(username, usernameRef.current);
           if (username !== usernameRef.current) {
             // show toast - user joined
-            console.log("User joined", username);
+            //console.log("User joined", username);
           }
           setUsers(clientsList);
+
+          /* socketRef.current.emit("sync-code", {
+            socketId,
+            code,
+          }); */
         }
       );
 
@@ -84,9 +91,9 @@ const CodeEditor = () => {
         "disconnected",
         ({ socketId, username }: { socketId: string; username: string }) => {
           //show toast user left room
-          console.log("Disconnecting", username);
+          // console.log("Disconnecting", username);
           setUsers((prev) => prev.filter((user) => user.socketId !== socketId));
-          console.log("User left", username);
+          //console.log("User left", username);
         }
       );
     };
@@ -105,13 +112,18 @@ const CodeEditor = () => {
 
     socketRef.current.on("code-change", (code: string, setValue: string) => {
       if (setValue) {
-        console.log(code);
+        //console.log(code);
         // set code
         /* console.log(editorRef.current);
           (editorRef.current as any).getModel().setValue(code);
           console.log(editorRef.current.getValue()); */
 
+        if (code === editorRef.current.getValue()) return;
+
         setCode(code);
+        console.log("Current cursor", cursor);
+        setCursor({ line: cursor.line, column: cursor.column });
+        console.log(cursor);
         editorRef.current.setValue(code);
       }
     });
@@ -126,12 +138,26 @@ const CodeEditor = () => {
   }
 
   const codeChange = (value: string | undefined, event: any) => {
-    console.log(value);
-    console.log(event);
-    socketRef.current.emit("code-change", {
+    //console.log(value);
+    //console.log(event);
+    const position = editorRef.current.getPosition();
+    console.log("Cursor after change", position);
+    setCursor({ line: position.line, column: position.column });
+
+    clearTimeout(timeOut);
+    const newTimeOut = setTimeout(() => {
+      socketRef.current.emit("code-change", {
+        roomId,
+        code: value,
+      });
+    }, 100);
+
+    setTimeOut(newTimeOut);
+
+    /*  socketRef.current.emit("code-change", {
       roomId,
       code: value,
-    });
+    }); */
   };
 
   return (
