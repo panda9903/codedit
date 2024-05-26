@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ReactElement, useEffect, useRef, useState } from "react";
-import Editor from "@monaco-editor/react";
+import ControlledEditor from "@monaco-editor/react";
 import { initSocket } from "../../socket";
 import { useParams } from "next/navigation";
 import { useSearchParams } from "next/navigation";
@@ -18,6 +18,7 @@ const CodeEditor = () => {
   const roomIdRef = useRef<string[] | string | null>(null);
   const usernameRef = useRef<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [code, setCode] = useState<string>("");
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -99,14 +100,48 @@ const CodeEditor = () => {
     };
   }, []);
 
-  function handleEditorDidMount(editor: any, monaco: any) {}
+  useEffect(() => {
+    if (!socketRef.current) return;
+
+    socketRef.current.on("code-change", (code: string, setValue: string) => {
+      if (setValue) {
+        console.log(code);
+        // set code
+        /* console.log(editorRef.current);
+          (editorRef.current as any).getModel().setValue(code);
+          console.log(editorRef.current.getValue()); */
+
+        setCode(code);
+        editorRef.current.setValue(code);
+      }
+    });
+
+    return () => {
+      socketRef.current.off("code-change");
+    };
+  }, [socketRef.current]);
+
+  function handleEditorDidMount(editor: any, monaco: any) {
+    editorRef.current = editor;
+  }
+
+  const codeChange = (value: string | undefined, event: any) => {
+    console.log(value);
+    console.log(event);
+    socketRef.current.emit("code-change", {
+      roomId,
+      code: value,
+    });
+  };
 
   return (
-    <Editor
+    <ControlledEditor
+      value={code}
       height="100vh"
       width="100vw"
       theme="vs-dark"
       language="javascript"
+      onChange={codeChange}
       onMount={handleEditorDidMount}
     />
   );
