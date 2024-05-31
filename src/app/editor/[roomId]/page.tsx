@@ -1,11 +1,12 @@
 "use client";
 
 import React, { ReactElement, useEffect, useRef, useState } from "react";
-import ControlledEditor from "@monaco-editor/react";
 import { initSocket } from "../../socket";
 import { useParams } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
 
 interface User {
   username: string;
@@ -20,7 +21,7 @@ const CodeEditor = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [code, setCode] = useState<string>("");
   const [timeOut, setTimeOut] = useState<any>(setTimeout(() => {}, 0));
-  const [cursor, setCursor] = useState<any>({ line: 0, column: 0 });
+  const cursorRef = useRef<{ line: 0; ch: 0 }>({ line: 0, ch: 0 });
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,7 +31,6 @@ const CodeEditor = () => {
 
   roomIdRef.current = roomId;
   usernameRef.current = username;
-  //console.log(roomId, username);
 
   const handleError = (err: any) => {
     console.error(err);
@@ -73,17 +73,15 @@ const CodeEditor = () => {
           username: string;
           socketId: string;
         }) => {
-          //console.log(username, usernameRef.current);
           if (username !== usernameRef.current) {
             // show toast - user joined
-            //console.log("User joined", username);
           }
           setUsers(clientsList);
 
-          /* socketRef.current.emit("sync-code", {
+          socketRef.current.emit("sync-code", {
             socketId,
             code,
-          }); */
+          });
         }
       );
 
@@ -91,9 +89,7 @@ const CodeEditor = () => {
         "disconnected",
         ({ socketId, username }: { socketId: string; username: string }) => {
           //show toast user left room
-          // console.log("Disconnecting", username);
           setUsers((prev) => prev.filter((user) => user.socketId !== socketId));
-          //console.log("User left", username);
         }
       );
     };
@@ -111,21 +107,14 @@ const CodeEditor = () => {
     if (!socketRef.current) return;
 
     socketRef.current.on("code-change", (code: string, setValue: string) => {
+      console.log("Code change from server", code);
       if (setValue) {
-        //console.log(code);
-        // set code
-        /* console.log(editorRef.current);
-          (editorRef.current as any).getModel().setValue(code);
-          console.log(editorRef.current.getValue()); */
-
-        if (code === editorRef.current.getValue()) return;
-
         setCode(code);
-        console.log("Current cursor", cursor);
-        setCursor({ line: cursor.line, column: cursor.column });
-        console.log(cursor);
-        editorRef.current.setValue(code);
       }
+    });
+
+    socketRef.current.on("sync-code", (code: string) => {
+      setCode(code);
     });
 
     return () => {
@@ -137,38 +126,33 @@ const CodeEditor = () => {
     editorRef.current = editor;
   }
 
-  const codeChange = (value: string | undefined, event: any) => {
-    //console.log(value);
-    //console.log(event);
-    const position = editorRef.current.getPosition();
-    console.log("Cursor after change", position);
-    setCursor({ line: position.line, column: position.column });
+  const codeChange = (editor: any, data: any, value: string) => {
+    const val = data.transactions[0].annotations[0].value;
+    const isUserEvent = data.transactions[0].isUserEvent(val);
+    console.log(data.transactions[0].isUserEvent(val));
 
     clearTimeout(timeOut);
+    //console.log(data.state.selection);
+    //console.log(data.getCursor());
+    //console.log(data.state.selection.main.head);
+    if (!isUserEvent) return;
     const newTimeOut = setTimeout(() => {
       socketRef.current.emit("code-change", {
         roomId,
-        code: value,
+        code: editor,
       });
-    }, 100);
+    }, 250);
 
     setTimeOut(newTimeOut);
-
-    /*  socketRef.current.emit("code-change", {
-      roomId,
-      code: value,
-    }); */
   };
 
   return (
-    <ControlledEditor
+    <CodeMirror
       value={code}
       height="100vh"
       width="100vw"
-      theme="vs-dark"
-      language="javascript"
       onChange={codeChange}
-      onMount={handleEditorDidMount}
+      extensions={[javascript({ jsx: true })]}
     />
   );
 };
