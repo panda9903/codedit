@@ -6,7 +6,10 @@ import { useParams } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import CodeMirror from "@uiw/react-codemirror";
-import { javascript } from "@codemirror/lang-javascript";
+import { loadLanguage } from "@uiw/codemirror-extensions-langs";
+import { useToast } from "@/components/ui/use-toast";
+
+import Header from "../Header";
 
 interface User {
   username: string;
@@ -18,22 +21,24 @@ const CodeEditor = () => {
   const socketRef = useRef<any>(null);
   const roomIdRef = useRef<string[] | string | null>(null);
   const usernameRef = useRef<string | null>(null);
+  const cursorRef = useRef<{ line: number; ch: number }>({ line: 0, ch: 0 });
+
   const [users, setUsers] = useState<User[]>([]);
   const [code, setCode] = useState<string>("");
   const [timeOut, setTimeOut] = useState<any>(setTimeout(() => {}, 0));
-  const cursorRef = useRef<{ line: 0; ch: 0 }>({ line: 0, ch: 0 });
+  const [lang, setLang] = useState("markdown");
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const username = searchParams.get("username");
-
   const { roomId } = useParams();
-
   roomIdRef.current = roomId;
   usernameRef.current = username;
 
-  const handleError = (err: any) => {
-    console.error(err);
+  const { toast } = useToast();
+
+  const changeLanguage = (lang: string) => {
+    setLang(lang);
   };
 
   useEffect(() => {
@@ -53,7 +58,10 @@ const CodeEditor = () => {
       });
 
       function handleError(err: Error) {
-        // show toast
+        toast({
+          variant: "destructive",
+          description: "Please try again later.",
+        });
         router.push("/");
       }
 
@@ -74,7 +82,11 @@ const CodeEditor = () => {
           socketId: string;
         }) => {
           if (username !== usernameRef.current) {
-            // show toast - user joined
+            toast({
+              variant: "success",
+              description: `${username} joined the room`,
+              duration: 1000,
+            });
           }
           setUsers(clientsList);
 
@@ -88,7 +100,11 @@ const CodeEditor = () => {
       socketRef.current.on(
         "disconnected",
         ({ socketId, username }: { socketId: string; username: string }) => {
-          //show toast user left room
+          toast({
+            variant: "destructive",
+            description: `${username} left the room`,
+            duration: 1000,
+          });
           setUsers((prev) => prev.filter((user) => user.socketId !== socketId));
         }
       );
@@ -107,9 +123,14 @@ const CodeEditor = () => {
     if (!socketRef.current) return;
 
     socketRef.current.on("code-change", (code: string, setValue: string) => {
-      console.log("Code change from server", code);
       if (setValue) {
         setCode(code);
+        /* console.log(cursorRef.current.line, cursorRef.current.ch);
+        editorRef.current.focus();
+        editorRef.current.setEditor({
+          line: cursorRef.current.line,
+          ch: cursorRef.current.ch,
+        }); */
       }
     });
 
@@ -122,19 +143,20 @@ const CodeEditor = () => {
     };
   }, [socketRef.current]);
 
-  function handleEditorDidMount(editor: any, monaco: any) {
-    editorRef.current = editor;
-  }
-
   const codeChange = (editor: any, data: any, value: string) => {
     const val = data.transactions[0].annotations[0].value;
     const isUserEvent = data.transactions[0].isUserEvent(val);
-    console.log(data.transactions[0].isUserEvent(val));
 
     clearTimeout(timeOut);
-    //console.log(data.state.selection);
-    //console.log(data.getCursor());
-    //console.log(data.state.selection.main.head);
+    const head = data.state.selection.main.head;
+    //console.log(data.state.doc);
+    //console.log(data.state.doc.lineAt(head));
+    const cursor = data.state.doc.lineAt(head);
+    let line = cursor.number;
+    let col = head - cursor.from;
+    //console.log("line", line, "col", col);
+    cursorRef.current = { line: line, ch: col };
+
     if (!isUserEvent) return;
     const newTimeOut = setTimeout(() => {
       socketRef.current.emit("code-change", {
@@ -147,13 +169,20 @@ const CodeEditor = () => {
   };
 
   return (
-    <CodeMirror
-      value={code}
-      height="100vh"
-      width="100vw"
-      onChange={codeChange}
-      extensions={[javascript({ jsx: true })]}
-    />
+    <>
+      <Header
+        clients={users}
+        roomId={roomIdRef.current}
+        changeLanguage={changeLanguage}
+      />
+      <CodeMirror
+        value={code}
+        onChange={codeChange}
+        height="100vh"
+        width="99vw"
+        extensions={[loadLanguage(lang)]}
+      />
+    </>
   );
 };
 
