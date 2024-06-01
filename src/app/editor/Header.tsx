@@ -3,6 +3,7 @@ import { useToast } from "@/components/ui/use-toast";
 import RoomId from "./RoomId";
 import ClientList from "./ClientList";
 import { SelectLanguage } from "./SelectLanguage";
+import { LLMButton } from "./LLMButton";
 
 interface User {
   username: string;
@@ -34,6 +35,7 @@ const Header = ({
       <div className="flex justify-between px-6 py-3 sticky top-0 z-10 bg-gray-100">
         <RoomId roomId={roomId} copyRoomId={copyRoomId} />
         <SelectLanguage changeLanguage={changeLanguage} />
+        <LLMButton />
         <ClientList clients={clients} />
       </div>
     </>

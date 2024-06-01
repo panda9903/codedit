@@ -1,7 +1,6 @@
 import React from "react";
 import Avatar from "react-avatar";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetClose,
@@ -12,7 +11,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { redirect } from "next/navigation";
 import LeaveButton from "./LeaveButton";
 interface User {
   username: string;
@@ -22,14 +20,6 @@ interface User {
 const ClientList = ({ clients }: { clients: User[] }) => {
   return (
     <div>
-      {/*       {clients.map((client) => (
-        <Avatar
-          key={client.socketId}
-          name={client.username}
-          size="30"
-          round="14px"
-        />
-      ))} */}
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="outline">Participants</Button>
@@ -37,14 +27,11 @@ const ClientList = ({ clients }: { clients: User[] }) => {
         <SheetContent>
           <SheetHeader>
             <SheetTitle>Pariticipants in the call</SheetTitle>
-            {/* <SheetDescription>
-              Make changes to your profile here. Click save when you're done.
-            </SheetDescription> */}
           </SheetHeader>
           <div className="flex flex-col">
             <div className="flex flex-col gap-y-4 mt-6">
               {clients.map((client) => (
-                <div className="flex gap-x-6">
+                <div className="flex gap-x-6" key={client.socketId}>
                   <Avatar
                     key={client.socketId}
                     name={client.username}
