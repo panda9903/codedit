@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { codeStore } from "@/store/codeStore";
 import { useToast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
 
 export function SubmitButton() {
   const code = codeStore((state) => state.code);
@@ -21,6 +22,18 @@ export function SubmitButton() {
   const [expectedOutput, setExpectedOutput] = useState("");
   const [output, setOutput] = useState("");
   const { toast } = useToast();
+
+  const whiteListedLanguages = [
+    "c",
+    "cpp",
+    "python",
+    "java",
+    "javascript",
+    "typescript",
+    "rust",
+    "go",
+    "php",
+  ];
 
   const values = {
     code: code,
@@ -65,21 +78,27 @@ export function SubmitButton() {
       console.log(data.outputofCode);
       setOutput(data.outputofCode);
     } else {
-      setOutput(data.stderr);
+      if (data.compileError.length > data.stderr.length) {
+        setOutput(data.compileError);
+      } else {
+        setOutput(data.stderr);
+      }
     }
     toast({
       title: data.statusOfCode,
-      description:
-        data.statusOfCode === "Accepted"
-          ? "Your code is correct"
-          : "Your code is incorrect",
+      description: "Please check the results",
       variant: data.statusOfCode === "Accepted" ? "success" : "destructive",
     });
   };
 
   return (
     <Sheet>
-      <SheetTrigger asChild>
+      <SheetTrigger
+        asChild
+        className={cn(
+          whiteListedLanguages.includes(language) ? "visited" : "invisible"
+        )}
+      >
         <Button variant="outline">Run</Button>
       </SheetTrigger>
       <SheetContent>

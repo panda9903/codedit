@@ -5,6 +5,7 @@ import ClientList from "./ClientList";
 import { SelectLanguage } from "./SelectLanguage";
 import { LLMButton } from "./LLMButton";
 import { SubmitButton } from "./SubmitButton";
+import { codeStore } from "@/store/codeStore";
 
 interface User {
   username: string;
