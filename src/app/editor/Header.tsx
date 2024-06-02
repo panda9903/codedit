@@ -4,6 +4,7 @@ import RoomId from "./RoomId";
 import ClientList from "./ClientList";
 import { SelectLanguage } from "./SelectLanguage";
 import { LLMButton } from "./LLMButton";
+import { SubmitButton } from "./SubmitButton";
 
 interface User {
   username: string;
@@ -36,6 +37,7 @@ const Header = ({
         <RoomId roomId={roomId} copyRoomId={copyRoomId} />
         <SelectLanguage changeLanguage={changeLanguage} />
         <LLMButton />
+        <SubmitButton />
         <ClientList clients={clients} />
       </div>
     </>

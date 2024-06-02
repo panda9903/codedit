@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { codeStore } from "@/store/codeStore";
 import {
   Select,
   SelectContent,
@@ -15,10 +15,12 @@ export function SelectLanguage({
 }: {
   changeLanguage: (lang: string) => void;
 }) {
+  const setLanguage = codeStore((state) => state.setLanguage);
   return (
     <Select
       onValueChange={(value) => {
         changeLanguage(value);
+        setLanguage(value);
       }}
     >
       <SelectTrigger className="w-[180px]">

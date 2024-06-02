@@ -69,14 +69,18 @@ export function LLMButton() {
           <Button onClick={chat} className="flex-none">
             Chat
           </Button>
-          <div className="wmde-markdown-var"> </div>
-          <MarkdownPreview
-            source={llmResponse}
-            className="p-2  border border-gray-500 rounded-lg"
-            wrapperElement={{
-              "data-color-mode": "light",
-            }}
-          />
+          {llmResponse !== "" && (
+            <>
+              <div className="wmde-markdown-var"> </div>
+              <MarkdownPreview
+                source={llmResponse}
+                className="p-2  border border-gray-500 rounded-lg"
+                wrapperElement={{
+                  "data-color-mode": "light",
+                }}
+              />
+            </>
+          )}
         </div>
       </SheetContent>
     </Sheet>

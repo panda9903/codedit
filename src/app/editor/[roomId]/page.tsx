@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import CodeMirror from "@uiw/react-codemirror";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { useToast } from "@/components/ui/use-toast";
-
+import { codeStore } from "@/store/codeStore";
 import Header from "../Header";
 
 interface User {
@@ -17,7 +17,7 @@ interface User {
 }
 
 const CodeEditor = () => {
-  const editorRef = useRef(null);
+  const setCodeInStore = codeStore((state) => state.setCode);
   const socketRef = useRef<any>(null);
   const roomIdRef = useRef<string[] | string | null>(null);
   const usernameRef = useRef<string | null>(null);
@@ -146,7 +146,7 @@ const CodeEditor = () => {
   const codeChange = (editor: any, data: any, value: string) => {
     const val = data.transactions[0].annotations[0].value;
     const isUserEvent = data.transactions[0].isUserEvent(val);
-
+    setCodeInStore(editor);
     clearTimeout(timeOut);
     const head = data.state.selection.main.head;
     //console.log(data.state.doc);
