@@ -34,12 +34,14 @@ const Header = ({
 
   return (
     <>
-      <div className="flex justify-between px-6 py-3 sticky top-0 z-10 bg-gray-100">
+      <div className="flex px-6 py-3 sticky top-0 z-10 bg-gray-100 justify-between gap-6">
         <RoomId roomId={roomId} copyRoomId={copyRoomId} />
-        <SelectLanguage changeLanguage={changeLanguage} />
-        <LLMButton />
-        <SubmitButton />
-        <ClientList clients={clients} />
+        <div className="flex md:gap-6 gap-1 flex-col md:flex-row">
+          <SelectLanguage changeLanguage={changeLanguage} />
+          <LLMButton />
+          <SubmitButton />
+          <ClientList clients={clients} />
+        </div>
       </div>
     </>
   );

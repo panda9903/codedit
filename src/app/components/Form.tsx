@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { generate, count } from "random-words";
 import { stat } from "fs";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -29,8 +29,9 @@ const formSchema = z.object({
   }),
 });
 
-export function ProfileForm() {
+export function RoomForm() {
   const [clicks, setClicks] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -46,6 +47,7 @@ export function ProfileForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
     const res = form.getValues();
 
     setUsername(res.username);
@@ -62,7 +64,7 @@ export function ProfileForm() {
     if (clicks !== 34) {
       roomId = generate({ exactly: 4, maxLength: 8, join: "-" });
     } else {
-      roomId = "super-supabase-supa-supabase";
+      roomId = "hi-i-am-satwik";
     }
 
     form.setValue("roomid", roomId);
@@ -99,7 +101,12 @@ export function ProfileForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Join</Button>
+          <Button
+            type="submit"
+            className={cn(loading == false ? " opacity-100" : "opacity-80")}
+          >
+            Join
+          </Button>
         </form>
       </Form>
       <Button onClick={() => generateRoom()}>Generate Room ID</Button>

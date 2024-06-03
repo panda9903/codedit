@@ -11,7 +11,7 @@ const LeaveButton = () => {
   };
 
   return (
-    <Button variant="destructive" onClick={leaveRoom}>
+    <Button variant="destructive" onClick={leaveRoom} className="mt-4">
       Leave Room
     </Button>
   );

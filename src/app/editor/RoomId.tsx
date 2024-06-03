@@ -8,7 +8,7 @@ const RoomId = ({
   copyRoomId: () => void;
 }) => {
   return (
-    <div className="flex gap-4">
+    <div className="flex flex-col md:flex-row gap-4">
       <p>
         Room ID: <span className="font-bold">{roomId}</span>
       </p>

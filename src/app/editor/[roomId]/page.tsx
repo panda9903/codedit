@@ -28,6 +28,9 @@ const CodeEditor = () => {
   const [timeOut, setTimeOut] = useState<any>(setTimeout(() => {}, 0));
   const [lang, setLang] = useState("markdown");
 
+  const setLanguage = codeStore((state) => state.setLanguage);
+  const setCodeVal = codeStore((state) => state.setCode);
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const username = searchParams.get("username");
@@ -47,6 +50,9 @@ const CodeEditor = () => {
         router.push("/");
         return;
       }
+
+      setLanguage("markdown");
+      setCodeVal("");
 
       socketRef.current = initSocket();
 

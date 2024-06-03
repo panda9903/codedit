@@ -115,7 +115,7 @@ export function SubmitButton() {
               onChange={(e) => setInput(e.target.value)}
               id="input"
               value={input}
-              className="col-span-3 border border-gray-500 text-black p-2 text-sm"
+              className="col-span-3 border border-gray-500 text-black p-2 text-sm rounded-xl"
             />
           </div>
           <div className="flex flex-col  gap-4">
@@ -126,7 +126,7 @@ export function SubmitButton() {
               onChange={(e) => setExpectedOutput(e.target.value)}
               id="expected output"
               value={expectedOutput}
-              className="col-span-3 border border-gray-500 text-black p-2 text-sm"
+              className="col-span-3 border border-gray-500 text-black p-2 text-sm rounded-xl"
             />
           </div>
         </div>
@@ -144,7 +144,7 @@ export function SubmitButton() {
           id=""
           placeholder="Your output will be displayed here"
           readOnly
-          className="border h-80 border-gray-500 text-black w-full mt-8 placeholder:text-sm p-2 text-sm placeholder-gray-500"
+          className="border h-64 rounded-xl border-gray-500 text-black w-full mt-8 placeholder:text-sm p-2 text-sm placeholder-gray-500"
         ></textarea>
       </SheetContent>
     </Sheet>
