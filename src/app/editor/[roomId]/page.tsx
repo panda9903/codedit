@@ -10,6 +10,7 @@ import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { useToast } from "@/components/ui/use-toast";
 import { codeStore } from "@/store/codeStore";
 import Header from "../Header";
+import { langList } from "../allowedLangs";
 
 interface User {
   username: string;
@@ -26,7 +27,7 @@ const CodeEditor = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [code, setCode] = useState<string>("");
   const [timeOut, setTimeOut] = useState<any>(setTimeout(() => {}, 0));
-  const [lang, setLang] = useState("markdown");
+  const [lang, setLang] = useState<langList>("markdown");
   const languageExtension = loadLanguage(lang || "markdown");
   const setLanguage = codeStore((state) => state.setLanguage);
   const setCodeVal = codeStore((state) => state.setCode);
@@ -41,7 +42,7 @@ const CodeEditor = () => {
   const { toast } = useToast();
 
   const changeLanguage = (lang: string) => {
-    setLang(lang);
+    setLang(lang as langList);
   };
 
   useEffect(() => {
