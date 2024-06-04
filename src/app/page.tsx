@@ -1,21 +1,19 @@
+"use client";
 import { MacbookScroll } from "./components/Laptop";
 import Header from "./components/Header";
 import { BackgroundGradientAnimation } from "./components/Background";
-import { ImageCarousel } from "./components/Components";
+import { ImageCarousel } from "./components/ImageCarousel";
 import { HeaderButton } from "./components/HeaderButton";
 import Footer from "./components/Footer";
-import { Inter, Roboto_Mono, Poppins } from "next/font/google";
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-});
-
+import { Roboto_Mono } from "next/font/google";
 const roboto = Roboto_Mono({
   subsets: ["latin"],
   display: "swap",
 });
 
 export default function Home() {
+  fetch("https://codedit-backend.onrender.com/");
+
   return (
     <div className="flex items-center justify-center flex-col overflow-clip">
       <Header />
@@ -39,13 +37,15 @@ export default function Home() {
           </p>
         </div>
       </BackgroundGradientAnimation>
-      <h1 className={`mt-40 text-3xl ${roboto.className}`}>
+      <h1
+        className={`md:mt-40 mt-10 text-2xl md:text-3xl px-6 md:px-0 ${roboto.className}`}
+      >
         Collaborate, seek assistance, and code together with other developers
       </h1>
       <MacbookScroll showGradient={true} title="Coding together made easy" />
       <div className="bg-white w-screen flex items-center justify-center z-50 flex-col">
         <ImageCarousel />
-        <div className="mt-20">
+        <div className="md:mt-20 mt-8">
           <HeaderButton />
         </div>
         <div className="mt-20">

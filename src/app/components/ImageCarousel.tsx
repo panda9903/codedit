@@ -14,14 +14,14 @@ import {
 export function ImageCarousel() {
   return (
     <Carousel
-      className="w-full max-w-6xl mt-20 "
+      className="w-full md:max-w-6xl max-w-md mt-20 "
       opts={{
         align: "start",
         loop: true,
       }}
       plugins={[
         Autoplay({
-          delay: 2000,
+          delay: 1500,
         }),
       ]}
     >

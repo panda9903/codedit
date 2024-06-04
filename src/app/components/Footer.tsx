@@ -3,9 +3,9 @@ import Logo from "./Logo";
 
 const Footer = () => {
   return (
-    <div className=" bg-gray-200 w-screen p-16 flex flex-col gap-10">
+    <div className=" bg-gray-200 w-screen md:p-16 md:pt-0 p-6 pb-12 flex flex-col gap-10">
       <Logo />
-      <div className="grid grid-cols-6">
+      <div className="grid grid-cols-2 w-3/4">
         <a href="https://github.com/panda9903/codedit" target="_blank">
           GitHub
         </a>

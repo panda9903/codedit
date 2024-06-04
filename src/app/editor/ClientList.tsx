@@ -1,5 +1,6 @@
 import React from "react";
-import Avatar from "react-avatar";
+import { Avatar } from "react-profile-avatar";
+
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -32,13 +33,14 @@ const ClientList = ({ clients }: { clients: User[] }) => {
             <div className="flex flex-col gap-y-4 mt-6">
               {clients.map((client) => (
                 <div className="flex gap-x-6" key={client.socketId}>
-                  <Avatar
-                    key={client.socketId}
-                    name={client.username}
-                    size="30"
-                    round="14px"
-                  />
-                  <span>{client.username}</span>
+                  {
+                    <Avatar
+                      key={client.socketId}
+                      name={client.username}
+                      className="p-1 border border-black rounded-full"
+                    />
+                  }
+                  <span className="mt-1">{client.username}</span>
                 </div>
               ))}
             </div>

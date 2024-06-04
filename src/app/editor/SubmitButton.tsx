@@ -63,7 +63,7 @@ export function SubmitButton() {
       return;
     }
 
-    const res = await fetch("http://localhost:5000/submit", {
+    const res = await fetch("https://codedit-backend.onrender.com/submit", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
