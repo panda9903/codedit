@@ -27,7 +27,7 @@ const CodeEditor = () => {
   const [code, setCode] = useState<string>("");
   const [timeOut, setTimeOut] = useState<any>(setTimeout(() => {}, 0));
   const [lang, setLang] = useState("markdown");
-
+  const languageExtension = loadLanguage(lang || "markdown");
   const setLanguage = codeStore((state) => state.setLanguage);
   const setCodeVal = codeStore((state) => state.setCode);
 
@@ -206,7 +206,7 @@ const CodeEditor = () => {
         onChange={codeChange}
         height="100vh"
         width="99vw"
-        extensions={[loadLanguage(lang)]}
+        extensions={languageExtension ? [languageExtension] : []}
       />
     </>
   );
