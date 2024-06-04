@@ -8,9 +8,10 @@ import { useRouter } from "next/navigation";
 import CodeMirror from "@uiw/react-codemirror";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { useToast } from "@/components/ui/use-toast";
-import { codeStore } from "@/store/codeStore";
+import { codeStore, dataStore } from "@/store/codeStore";
 import Header from "../Header";
 import { langList } from "../allowedLangs";
+import { socketStore } from "@/store/codeStore";
 
 interface User {
   username: string;
@@ -23,7 +24,7 @@ const CodeEditor = () => {
   const roomIdRef = useRef<string[] | string | null>(null);
   const usernameRef = useRef<string | null>(null);
   const cursorRef = useRef<{ line: number; ch: number }>({ line: 0, ch: 0 });
-
+  const setSocket = socketStore((state) => state.setSocket);
   const [users, setUsers] = useState<User[]>([]);
   const [code, setCode] = useState<string>("");
   const [timeOut, setTimeOut] = useState<any>(setTimeout(() => {}, 0));
@@ -31,13 +32,16 @@ const CodeEditor = () => {
   const languageExtension = loadLanguage(lang || "markdown");
   const setLanguage = codeStore((state) => state.setLanguage);
   const setCodeVal = codeStore((state) => state.setCode);
+  const setRoomId = dataStore((state) => state.setRoomId);
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const username = searchParams.get("username");
-  const { roomId } = useParams();
+  const { roomId }: { roomId: string } = useParams();
   roomIdRef.current = roomId;
   usernameRef.current = username;
+
+  setRoomId(roomId);
 
   const { toast } = useToast();
 
@@ -56,6 +60,7 @@ const CodeEditor = () => {
       setCodeVal("");
 
       socketRef.current = initSocket();
+      setSocket(socketRef.current);
 
       socketRef.current.on("connect_error", (err: Error) => {
         handleError(err);
@@ -129,6 +134,15 @@ const CodeEditor = () => {
   useEffect(() => {
     if (!socketRef.current) return;
 
+    socketRef.current.on(
+      "change-language",
+      ({ language }: { language: langList }) => {
+        console.log("Lang is", language);
+        setLanguage(language);
+        changeLanguage(language);
+      }
+    );
+
     socketRef.current.on("code-change", (code: string, setValue: string) => {
       if (setValue) {
         setCode(code);
@@ -176,8 +190,8 @@ const CodeEditor = () => {
   }; */
 
   const codeChange = (value: string, viewUpdate: any) => {
-    console.log(value);
-    console.log(viewUpdate);
+    //console.log(value);
+    //console.log(viewUpdate);
     clearTimeout(timeOut);
     const val = viewUpdate.transactions[0].annotations[0].value;
     const isUserEvent = viewUpdate.transactions[0].isUserEvent(val);

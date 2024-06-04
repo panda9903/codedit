@@ -1,5 +1,5 @@
 import * as React from "react";
-import { codeStore } from "@/store/codeStore";
+import { codeStore, dataStore, socketStore } from "@/store/codeStore";
 import {
   Select,
   SelectContent,
@@ -16,11 +16,21 @@ export function SelectLanguage({
   changeLanguage: (lang: string) => void;
 }) {
   const setLanguage = codeStore((state) => state.setLanguage);
+  const language = codeStore((state) => state.language);
+  const socket = socketStore((state) => state.socket);
+  const roomId = dataStore((state) => state.roomId);
+
   return (
     <Select
+      value={language}
       onValueChange={(value) => {
         changeLanguage(value);
         setLanguage(value);
+
+        socket.emit("change-language", {
+          roomId: roomId,
+          language: value,
+        });
       }}
     >
       <SelectTrigger className="w-[180px]">
@@ -48,6 +58,7 @@ export function SelectLanguage({
           <SelectItem value="tsx">TSX</SelectItem>
           <SelectItem value="angular">Angular</SelectItem>
           <SelectItem value="vue">Vue</SelectItem>
+          <SelectItem value="markdown">Markdown</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>
