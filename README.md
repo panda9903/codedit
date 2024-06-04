@@ -1,6 +1,6 @@
 # codEdit
 
-codEdit is a collaborative coding platform. 
+codEdit is a collaborative coding platform. Visit [https://codedit-alpha.vercel.app]here
 
 ## Features
 - Multiple people collaborating on a single code file
