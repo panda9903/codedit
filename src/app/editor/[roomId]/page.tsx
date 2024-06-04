@@ -149,7 +149,7 @@ const CodeEditor = () => {
     };
   }, [socketRef.current]);
 
-  const codeChange = (editor: any, data: any, value: string) => {
+  /* const codeChange = (editor: any, data: any, value: string) => {
     const val = data.transactions[0].annotations[0].value;
     const isUserEvent = data.transactions[0].isUserEvent(val);
     setCodeInStore(editor);
@@ -168,6 +168,26 @@ const CodeEditor = () => {
       socketRef.current.emit("code-change", {
         roomId,
         code: editor,
+      });
+    }, 250);
+
+    setTimeOut(newTimeOut);
+  }; */
+
+  const codeChange = (value: string, viewUpdate: any) => {
+    console.log(value);
+    console.log(viewUpdate);
+    clearTimeout(timeOut);
+    const val = viewUpdate.transactions[0].annotations[0].value;
+    const isUserEvent = viewUpdate.transactions[0].isUserEvent(val);
+    setCodeInStore(value);
+    setCode(value);
+
+    if (!isUserEvent) return;
+    const newTimeOut = setTimeout(() => {
+      socketRef.current.emit("code-change", {
+        roomId,
+        code: value,
       });
     }, 250);
 
