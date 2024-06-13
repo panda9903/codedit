@@ -13,6 +13,10 @@ codEdit is a collaborative coding platform. Visit [here](https://codedit-alpha.v
 ---
 
 
+Visit the backend [here](https://github.com/panda9903/codedit-backend).
+
+---
+
 ### Running locally
 
 - Clone the repo
